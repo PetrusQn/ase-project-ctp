@@ -28,26 +28,6 @@ public class Distance {
         return new Distance(this.kilometers + otherDistance.getKilometers());
     }
 
-    public boolean isGreaterThan(Distance otherDistance) {
-        return this.kilometers > otherDistance.getKilometers();
-    }
-
-    public boolean isZero() {
-        return this.kilometers == 0;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Distance distance)) return false;
-        return Double.compare(distance.getKilometers(), this.kilometers) == 0;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.kilometers);
-    }
-
     @Override
     public String toString() {
         return this.kilometers + " km";
