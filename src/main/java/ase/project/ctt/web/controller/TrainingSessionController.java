@@ -7,9 +7,11 @@ import ase.project.ctt.domain.model.TrainingSession;
 import ase.project.ctt.domain.model.enums.TrainingType;
 import ase.project.ctt.domain.model.valueobjects.SessionId;
 import ase.project.ctt.infrastructure.repository.TrainingSessionRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -35,6 +37,13 @@ public class TrainingSessionController {
                 .map(TrainingSessionMapper::toDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity<TrainingSessionDto> createTrainingSession(@RequestBody TrainingSessionDto requestDto) {
+        TrainingSession newSession = TrainingSessionMapper.fromDto(requestDto);
+        trainingSessionRepository.save(newSession);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 //    @GetMapping("/type/{type}")
