@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(Constants.API_VERSIONPATH)
+@RequestMapping(Constants.API_VERSIONPATH + Constants.TRAINING_SESSION_SUFFIX)
 public class TrainingSessionController {
 
     private final TrainingSessionRepository trainingSessionRepository;
