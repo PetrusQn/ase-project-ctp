@@ -4,5 +4,4 @@ public enum TrainingType {
     RECOVERY,
     BASE,
     INTENSITY,
-    UNDEFINED
 }
