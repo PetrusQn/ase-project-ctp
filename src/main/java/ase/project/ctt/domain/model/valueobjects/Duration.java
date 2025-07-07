@@ -1,5 +1,6 @@
 package ase.project.ctt.domain.model.valueobjects;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
 import java.util.Objects;
@@ -7,6 +8,7 @@ import java.util.Objects;
 @Embeddable
 public class Duration {
 
+    @Column(name = "duration_minutes")
     private double minutes;
 
     protected Duration() {
