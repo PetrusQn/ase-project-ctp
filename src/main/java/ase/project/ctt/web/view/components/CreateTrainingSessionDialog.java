@@ -1,7 +1,11 @@
 package ase.project.ctt.web.view.components;
 
+import ase.project.ctt.application.mapper.TrainingSessionMapper;
+import ase.project.ctt.domain.model.TrainingSession;
 import ase.project.ctt.domain.model.enums.TrainingStatus;
 import ase.project.ctt.domain.model.enums.TrainingType;
+import ase.project.ctt.domain.model.valueobjects.*;
+import ase.project.ctt.infrastructure.service.TrainingSessionService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -17,7 +21,20 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 
 public class CreateTrainingSessionDialog extends Dialog {
 
-    public CreateTrainingSessionDialog() {
+    private TrainingSessionService client;
+
+    private DatePicker datePicker;
+    private NumberField durationField;
+    private NumberField distanceField;
+    private Select<String> typeSelector;
+    private Select<String> statusSelector;
+    private NumberField avgPowerField;
+    private NumberField avgHrField;
+    private NumberField avgCadenceField;
+    private TextArea noteField;
+
+    public CreateTrainingSessionDialog(TrainingSessionService client) {
+        this.client = client;
         this.setHeaderTitle("New training session");
         VerticalLayout dialogLayout = new VerticalLayout();
         dialogLayout.add(createCreationForm());
@@ -30,9 +47,35 @@ public class CreateTrainingSessionDialog extends Dialog {
         Button saveButton = new Button("Save");
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveButton.addClickListener(event -> {
-           // To be implemented
+            client.createSession(TrainingSessionMapper.toDto(TrainingSession.create(datePicker.getValue(),
+                    new Duration(durationField.getValue()),
+                    new Distance(distanceField.getValue()),
+                    this.getTrainingType(typeSelector),
+                    this.getTrainingStatus(statusSelector),
+                    new AvgPower(avgPowerField.getValue().intValue()),
+                    new AvgHeartRate(avgHrField.getValue().intValue()),
+                    new AvgCadence(avgCadenceField.getValue().intValue()),
+                    noteField.getValue())));
+            this.close();
         });
         return saveButton;
+    }
+
+    private TrainingType getTrainingType(Select<String> trainingType) {
+        return switch (trainingType.getValue()) {
+            case "recovery" -> TrainingType.RECOVERY;
+            case "base" -> TrainingType.BASE;
+            case "intensity" -> TrainingType.INTENSITY;
+            default -> TrainingType.UNDEFINED;
+        };
+    }
+
+    private TrainingStatus getTrainingStatus(Select<String> trainingStatus) {
+        return switch (trainingStatus.getValue()) {
+          case "planned" -> TrainingStatus.PLANNED;
+          case "completed" -> TrainingStatus.COMPLETED;
+          default -> TrainingStatus.UNDEFINED;
+        };
     }
 
     private Button createCancelButton() {
@@ -40,24 +83,24 @@ public class CreateTrainingSessionDialog extends Dialog {
     }
 
     private FormLayout createCreationForm() {
-        DatePicker datePicker = new DatePicker("Execution date");
+        this.datePicker = new DatePicker("Execution date");
 
-        NumberField durationField = createNumberField("Duration", "mins");
-        NumberField distanceField = createNumberField("Distance", "km");
+        this.durationField = createNumberField("Duration", "mins");
+        this.distanceField = createNumberField("Distance", "km");
 
-        Select<String> typeSelector = new Select<>();
+        this.typeSelector = new Select<>();
         typeSelector.setLabel("Training type");
         typeSelector.setItems(TrainingType.RECOVERY.name().toLowerCase(), TrainingType.BASE.name().toLowerCase(), TrainingType.INTENSITY.name().toLowerCase());
 
-        Select<String> statusSelector = new Select<>();
+        this.statusSelector = new Select<>();
         statusSelector.setLabel("Training status");
         statusSelector.setItems(TrainingStatus.PLANNED.name().toLowerCase(), TrainingStatus.COMPLETED.name().toLowerCase());
 
-        NumberField avgPowerField = createNumberField("Average power", "w");
-        NumberField avgHrField = createNumberField("Average heart rate", "bpm");
-        NumberField avgCadence = createNumberField("Average cadence", "rpm");
+        this.avgPowerField = createNumberField("Average power", "w");
+        this.avgHrField = createNumberField("Average heart rate", "bpm");
+        this.avgCadenceField = createNumberField("Average cadence", "rpm");
 
-        TextArea noteField = createNoteField();
+        this.noteField = createNoteField();
 
         FormLayout formLayout = new FormLayout();
         formLayout.setAutoResponsive(true);
@@ -73,7 +116,7 @@ public class CreateTrainingSessionDialog extends Dialog {
         thirdRow.add(typeSelector, statusSelector);
 
         FormLayout.FormRow fourthRow = new FormLayout.FormRow();
-        fourthRow.add(avgPowerField, avgHrField, avgCadence);
+        fourthRow.add(avgPowerField, avgHrField, avgCadenceField);
 
         FormLayout.FormRow fifthRow = new FormLayout.FormRow();
         fifthRow.add(noteField, 3);

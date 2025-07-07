@@ -67,7 +67,7 @@ public class TrainingSession {
         this.notes = notes;
     }
 
-    public static TrainingSession create(SessionId id,
+    public static TrainingSession create(
                          LocalDate date,
                          Duration duration,
                          Distance distance,

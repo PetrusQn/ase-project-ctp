@@ -10,7 +10,6 @@ public class TrainingSessionMapper {
 
     public static TrainingSession fromDto(TrainingSessionDto dto) {
         return TrainingSession.create(
-                SessionId.newId(),
                 dto.date(),
                 new Duration(dto.durationInMinutes()),
                 new Distance(dto.distanceInKm()),

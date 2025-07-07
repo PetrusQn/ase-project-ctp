@@ -24,7 +24,7 @@ public class HomeView extends VerticalLayout {
     public HomeView(TrainingSessionService client) {
         this.client = client;
         this.initializeGrid();
-        Dialog createTrainingSessionDialog = new CreateTrainingSessionDialog();
+        Dialog createTrainingSessionDialog = new CreateTrainingSessionDialog(this.client);
         this.add(new AddTrainingSessionButton(createTrainingSessionDialog));
     }
 
