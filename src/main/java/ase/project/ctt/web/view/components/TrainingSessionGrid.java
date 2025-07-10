@@ -24,4 +24,8 @@ public class TrainingSessionGrid extends Grid<TrainingSessionDto> {
         this.addColumn(TrainingSessionDto::trainingType).setHeader("Type");
         this.addColumn(TrainingSessionDto::notes).setHeader("Note");
     }
+
+    public void updateContent(List<TrainingSessionDto> updatedContent) {
+        this.setItems(updatedContent);
+    }
 }

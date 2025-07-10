@@ -1,5 +1,6 @@
 package ase.project.ctt.web.view.components;
 
+import ase.project.ctt.application.NewTrainingSessionObserver;
 import ase.project.ctt.application.mapper.TrainingSessionMapper;
 import ase.project.ctt.domain.model.TrainingSession;
 import ase.project.ctt.domain.model.enums.TrainingStatus;
@@ -20,11 +21,13 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
 import java.time.LocalDate;
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class CreateTrainingSessionDialog extends Dialog {
 
-    private TrainingSessionService client;
+    private final TrainingSessionService client;
+    private List<NewTrainingSessionObserver> observers;
 
     private DatePicker datePicker;
     private NumberField durationField;
@@ -37,6 +40,7 @@ public class CreateTrainingSessionDialog extends Dialog {
 
     public CreateTrainingSessionDialog(TrainingSessionService client) {
         this.client = client;
+        this.observers = new ArrayList<>();
         this.setHeaderTitle("New training session");
         VerticalLayout dialogLayout = new VerticalLayout();
         dialogLayout.add(createCreationForm());
@@ -45,11 +49,22 @@ public class CreateTrainingSessionDialog extends Dialog {
         this.getFooter().add(createCancelButton());
     }
 
+    public void addObserver(NewTrainingSessionObserver observer) {
+        this.observers.add(observer);
+    }
+
+    public void updateGridView() {
+        for (NewTrainingSessionObserver observer : this.observers) {
+            observer.update();
+        }
+    }
+
     private Button createSaveButton() {
         Button saveButton = new Button("Save");
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveButton.addClickListener(event -> {
             if (this.onFormSubmit()) {
+                this.updateGridView();
                 this.close();
                 this.resetAllInputFields();
             }
@@ -70,7 +85,7 @@ public class CreateTrainingSessionDialog extends Dialog {
                     this.noteField.getValue())));
             return true;
         } else {
-            Notification.show("Please fill all the necessary boxes");
+            Notification.show("Notes are required. Please enter some (e.g. the name of the session)");
             return false;
         }
     }
@@ -127,6 +142,7 @@ public class CreateTrainingSessionDialog extends Dialog {
         this.typeSelector.setLabel("Training type");
         this.typeSelector.setRequiredIndicatorVisible(true);
         this.typeSelector.setItems(TrainingType.RECOVERY.name().toLowerCase(), TrainingType.BASE.name().toLowerCase(), TrainingType.INTENSITY.name().toLowerCase());
+        this.typeSelector.setValue("base");
 
         this.avgPowerField = createNumberField("Average power", "w");
         this.avgHrField = createNumberField("Average heart rate", "bpm");
@@ -175,10 +191,8 @@ public class CreateTrainingSessionDialog extends Dialog {
         noteField.setRequired(true);
         noteField.setValueChangeMode(ValueChangeMode.EAGER);
         noteField.setPlaceholder("Easy Zone 2 ride");
-        noteField.addValueChangeListener(e -> {
-            e.getSource()
-                    .setHelperText(e.getValue().length() + "/100");
-        });
+        noteField.addValueChangeListener(e -> e.getSource()
+                .setHelperText(e.getValue().length() + "/100"));
         return noteField;
     }
 }
