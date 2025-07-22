@@ -1,4 +1,4 @@
-package ase.project.ctt.web.view.components;
+package ase.project.ctt.web.view.components.input;
 
 import com.vaadin.flow.component.html.Div;
 

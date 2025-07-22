@@ -1,4 +1,4 @@
-package ase.project.ctt.web.view.components;
+package ase.project.ctt.web.view.components.input;
 
 import ase.project.ctt.domain.model.enums.TrainingType;
 import com.vaadin.flow.component.select.Select;

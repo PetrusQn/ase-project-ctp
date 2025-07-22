@@ -1,40 +1,41 @@
-package ase.project.ctt.web.view.components;
+package ase.project.ctt.web.view.components.dialog;
 
 import ase.project.ctt.application.NewTrainingSessionObserver;
+import ase.project.ctt.application.dto.TrainingSessionDto;
 import ase.project.ctt.application.mapper.TrainingSessionMapper;
 import ase.project.ctt.domain.model.TrainingSession;
 import ase.project.ctt.domain.model.enums.TrainingStatus;
 import ase.project.ctt.domain.model.enums.TrainingType;
 import ase.project.ctt.domain.model.valueobjects.*;
 import ase.project.ctt.infrastructure.service.TrainingSessionService;
+import ase.project.ctt.web.view.components.input.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import org.checkerframework.checker.units.qual.N;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateTrainingSessionDialog extends Dialog {
+public class TrainingSessionDialog extends Dialog {
 
     private final TrainingSessionService client;
     private final List<NewTrainingSessionObserver> observers;
 
-    private ase.project.ctt.web.view.components.DatePicker datePicker;
-    private ase.project.ctt.web.view.components.NumberField durationField;
-    private ase.project.ctt.web.view.components.NumberField distanceField;
-    private ase.project.ctt.web.view.components.NumberField avgPowerField;
-    private ase.project.ctt.web.view.components.NumberField avgHrField;
-    private ase.project.ctt.web.view.components.NumberField avgCadenceField;
+    private DatePicker datePicker;
+    private NumberField durationField;
+    private NumberField distanceField;
+    private NumberField avgPowerField;
+    private NumberField avgHrField;
+    private NumberField avgCadenceField;
     private TypeSelector typeSelector;
     private NoteField noteField;
     private NameField nameField;
 
-    public CreateTrainingSessionDialog(TrainingSessionService client) {
+    public TrainingSessionDialog(TrainingSessionService client) {
         this.client = client;
         this.observers = new ArrayList<>();
         this.setHeaderTitle("New training session");
@@ -82,23 +83,27 @@ public class CreateTrainingSessionDialog extends Dialog {
     }
 
     private boolean onFormSubmit() {
-        if(areRequiredFieldsSet()) {
-            client.createSession(TrainingSessionMapper.toDto(TrainingSession.create(
-                    datePicker.getValue(),
-                    new Duration(this.durationField.getValue()),
-                    new Distance(this.distanceField.getValue()),
-                    this.getTrainingType(this.typeSelector),
-                    this.calcTrainingStatus(),
-                    new AvgPower(this.avgPowerField.getValue().intValue()),
-                    new AvgHeartRate(this.avgHrField.getValue().intValue()),
-                    new AvgCadence(this.avgCadenceField.getValue().intValue()),
-                    this.noteField.getValue(), this.nameField.getValue())
-            ));
+        if (areRequiredFieldsSet()) {
+            client.createSession(createSessionDtoFromUserInput());
             return true;
         } else {
             Notification.show("Name is required. Please enter any");
             return false;
         }
+    }
+
+    private TrainingSessionDto createSessionDtoFromUserInput() {
+        return TrainingSessionMapper.toDto(
+                TrainingSession.create(
+                        datePicker.getValue(),
+                        new Duration(this.durationField.getValue()),
+                        new Distance(this.distanceField.getValue()),
+                        this.getTrainingType(),
+                        this.calcTrainingStatus(),
+                        new AvgPower(this.avgPowerField.getValue().intValue()),
+                        new AvgHeartRate(this.avgHrField.getValue().intValue()),
+                        new AvgCadence(this.avgCadenceField.getValue().intValue()),
+                        this.noteField.getValue(), this.nameField.getValue()));
     }
 
     private boolean areRequiredFieldsSet() {
@@ -117,8 +122,8 @@ public class CreateTrainingSessionDialog extends Dialog {
         this.avgPowerField.resetValue();
     }
 
-    private TrainingType getTrainingType(TypeSelector trainingType) {
-        return switch (trainingType.getValue()) {
+    private TrainingType getTrainingType() {
+        return switch (this.typeSelector.getValue()) {
             case "recovery" -> TrainingType.RECOVERY;
             case "intensity" -> TrainingType.INTENSITY;
             default -> TrainingType.BASE;
@@ -126,7 +131,7 @@ public class CreateTrainingSessionDialog extends Dialog {
     }
 
     private TrainingStatus calcTrainingStatus() {
-        if(LocalDate.now().isBefore(datePicker.getValue())) {
+        if (LocalDate.now().isBefore(datePicker.getValue())) {
             return TrainingStatus.PLANNED;
         } else {
             return TrainingStatus.COMPLETED;

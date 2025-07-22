@@ -1,12 +1,12 @@
 package ase.project.ctt.web.view.components;
 
 import ase.project.ctt.application.dto.TrainingSessionDto;
+import ase.project.ctt.web.view.components.dialog.EditTrainingSessionDialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
 import java.util.List;
 
 public class TrainingSessionGrid extends Grid<TrainingSessionDto> {
@@ -43,6 +43,7 @@ public class TrainingSessionGrid extends Grid<TrainingSessionDto> {
     }
 
     private void onDoubleClick(TrainingSessionDto clickedSessionDto) {
-        System.out.println("Double Click on: " + clickedSessionDto.notes());
+        EditTrainingSessionDialog editTrainingSessionDialog = new EditTrainingSessionDialog(clickedSessionDto);
+        editTrainingSessionDialog.open();
     }
 }
