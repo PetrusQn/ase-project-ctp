@@ -41,6 +41,8 @@ public class TrainingSession {
 
     private String notes;
 
+    private String name;
+
     protected TrainingSession() {
         // for jpa
     }
@@ -54,7 +56,8 @@ public class TrainingSession {
                             AvgPower avgPower,
                             AvgHeartRate avgHr,
                             AvgCadence avgCadence,
-                            String notes) {
+                            String notes,
+                            String name) {
         this.id = id;
         this.date = date;
         this.duration = duration;
@@ -65,6 +68,7 @@ public class TrainingSession {
         this.avgHr = avgHr;
         this.avgCadence = avgCadence;
         this.notes = notes;
+        this.name = name;
     }
 
     public static TrainingSession create(
@@ -76,7 +80,8 @@ public class TrainingSession {
                          AvgPower avgPower,
                          AvgHeartRate avgHr,
                          AvgCadence avgCadence,
-                         String notes) {
+                         String notes,
+                         String name) {
         return new TrainingSession(
                 SessionId.newId(),
                 date,
@@ -87,7 +92,8 @@ public class TrainingSession {
                 avgPower,
                 avgHr,
                 avgCadence,
-                notes);
+                notes,
+                name);
     }
 
     public SessionId getId() {
@@ -130,6 +136,10 @@ public class TrainingSession {
         return this.notes;
     }
 
+    public String getName() {
+        return this.name;
+    }
+
     public void updateDuration(Duration newDuration) {
         this.duration = newDuration;
     }
@@ -160,5 +170,9 @@ public class TrainingSession {
 
     public void updateNotes(String newNotes) {
         this.notes = newNotes;
+    }
+
+    public void updateName(String newName) {
+        this.name = newName;
     }
 }

@@ -18,7 +18,8 @@ public class TrainingSessionMapper {
                 new AvgPower(dto.avgPower()),
                 new AvgHeartRate(dto.avgHeartRate()),
                 new AvgCadence(dto.avgCadence()),
-                dto.notes()
+                dto.notes(),
+                dto.name()
         );
     }
 
@@ -32,7 +33,8 @@ public class TrainingSessionMapper {
                 trainingSession.getAvgPower().getAvgPower(),
                 trainingSession.getAvgHr().getAvgHr(),
                 trainingSession.getAvgCadence().getAvgCadence(),
-                trainingSession.getNotes()
+                trainingSession.getNotes(),
+                trainingSession.getName()
         );
     }
 }

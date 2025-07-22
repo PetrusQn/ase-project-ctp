@@ -9,16 +9,11 @@ import ase.project.ctt.domain.model.valueobjects.*;
 import ase.project.ctt.infrastructure.service.TrainingSessionService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.component.textfield.NumberField;
-import com.vaadin.flow.component.textfield.TextArea;
-import com.vaadin.flow.data.value.ValueChangeMode;
+import org.checkerframework.checker.units.qual.N;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -27,26 +22,40 @@ import java.util.List;
 public class CreateTrainingSessionDialog extends Dialog {
 
     private final TrainingSessionService client;
-    private List<NewTrainingSessionObserver> observers;
+    private final List<NewTrainingSessionObserver> observers;
 
-    private DatePicker datePicker;
-    private NumberField durationField;
-    private NumberField distanceField;
-    private Select<String> typeSelector;
-    private NumberField avgPowerField;
-    private NumberField avgHrField;
-    private NumberField avgCadenceField;
-    private TextArea noteField;
+    private ase.project.ctt.web.view.components.DatePicker datePicker;
+    private ase.project.ctt.web.view.components.NumberField durationField;
+    private ase.project.ctt.web.view.components.NumberField distanceField;
+    private ase.project.ctt.web.view.components.NumberField avgPowerField;
+    private ase.project.ctt.web.view.components.NumberField avgHrField;
+    private ase.project.ctt.web.view.components.NumberField avgCadenceField;
+    private TypeSelector typeSelector;
+    private NoteField noteField;
+    private NameField nameField;
 
     public CreateTrainingSessionDialog(TrainingSessionService client) {
         this.client = client;
         this.observers = new ArrayList<>();
         this.setHeaderTitle("New training session");
+        this.initInputFields();
         VerticalLayout dialogLayout = new VerticalLayout();
-        dialogLayout.add(createCreationForm());
+        dialogLayout.add(createForm());
         this.add(dialogLayout);
         this.getFooter().add(createSaveButton());
         this.getFooter().add(createCancelButton());
+    }
+
+    private void initInputFields() {
+        this.datePicker = new DatePicker();
+        this.durationField = new NumberField("Duration", "min");
+        this.distanceField = new NumberField("Distance", "km");
+        this.avgPowerField = new NumberField("Average power", "w");
+        this.avgHrField = new NumberField("Average heart rate", "bpm");
+        this.avgCadenceField = new NumberField("Average cadence", "rpm");
+        this.typeSelector = new TypeSelector();
+        this.noteField = new NoteField();
+        this.nameField = new NameField();
     }
 
     public void addObserver(NewTrainingSessionObserver observer) {
@@ -74,7 +83,8 @@ public class CreateTrainingSessionDialog extends Dialog {
 
     private boolean onFormSubmit() {
         if(areRequiredFieldsSet()) {
-            client.createSession(TrainingSessionMapper.toDto(TrainingSession.create(datePicker.getValue(),
+            client.createSession(TrainingSessionMapper.toDto(TrainingSession.create(
+                    datePicker.getValue(),
                     new Duration(this.durationField.getValue()),
                     new Distance(this.distanceField.getValue()),
                     this.getTrainingType(this.typeSelector),
@@ -82,30 +92,32 @@ public class CreateTrainingSessionDialog extends Dialog {
                     new AvgPower(this.avgPowerField.getValue().intValue()),
                     new AvgHeartRate(this.avgHrField.getValue().intValue()),
                     new AvgCadence(this.avgCadenceField.getValue().intValue()),
-                    this.noteField.getValue())));
+                    this.noteField.getValue(), this.nameField.getValue())
+            ));
             return true;
         } else {
-            Notification.show("Notes are required. Please enter some (e.g. the name of the session)");
+            Notification.show("Name is required. Please enter any");
             return false;
         }
     }
 
     private boolean areRequiredFieldsSet() {
-        return !this.noteField.isEmpty();
+        return !this.nameField.isEmpty();
     }
 
     private void resetAllInputFields() {
-        this.datePicker.setValue(LocalDate.now());
-        this.durationField.setValue(0.0);
-        this.distanceField.setValue(0.0);
-        this.typeSelector.setValue("base");
-        this.avgPowerField.setValue(0.0);
-        this.avgHrField.setValue(0.0);
-        this.avgCadenceField.setValue(0.0);
-        this.noteField.setValue("");
+        this.datePicker.resetValue();
+        this.nameField.resetValue();
+        this.noteField.resetValue();
+        this.typeSelector.resetValue();
+        this.durationField.resetValue();
+        this.distanceField.resetValue();
+        this.avgCadenceField.resetValue();
+        this.avgHrField.resetValue();
+        this.avgPowerField.resetValue();
     }
 
-    private TrainingType getTrainingType(Select<String> trainingType) {
+    private TrainingType getTrainingType(TypeSelector trainingType) {
         return switch (trainingType.getValue()) {
             case "recovery" -> TrainingType.RECOVERY;
             case "intensity" -> TrainingType.INTENSITY;
@@ -130,32 +142,13 @@ public class CreateTrainingSessionDialog extends Dialog {
         return cancelButton;
     }
 
-    private FormLayout createCreationForm() {
-        this.datePicker = new DatePicker("Execution date");
-        this.datePicker.setRequired(true);
-        this.datePicker.setValue(LocalDate.now());
-
-        this.durationField = createNumberField("Duration", "mins");
-        this.distanceField = createNumberField("Distance", "km");
-
-        this.typeSelector = new Select<>();
-        this.typeSelector.setLabel("Training type");
-        this.typeSelector.setRequiredIndicatorVisible(true);
-        this.typeSelector.setItems(TrainingType.RECOVERY.name().toLowerCase(), TrainingType.BASE.name().toLowerCase(), TrainingType.INTENSITY.name().toLowerCase());
-        this.typeSelector.setValue("base");
-
-        this.avgPowerField = createNumberField("Average power", "w");
-        this.avgHrField = createNumberField("Average heart rate", "bpm");
-        this.avgCadenceField = createNumberField("Average cadence", "rpm");
-
-        this.noteField = createNoteField();
-
+    private FormLayout createForm() {
         FormLayout formLayout = new FormLayout();
         formLayout.setAutoResponsive(true);
         formLayout.setExpandFields(true);
 
         FormLayout.FormRow firstRow = new FormLayout.FormRow();
-        firstRow.add(datePicker, 1);
+        firstRow.add(nameField, datePicker);
 
         FormLayout.FormRow secondRow = new FormLayout.FormRow();
         secondRow.add(durationField, distanceField);
@@ -172,27 +165,5 @@ public class CreateTrainingSessionDialog extends Dialog {
         formLayout.add(firstRow, secondRow, thirdRow, fourthRow, fifthRow);
 
         return formLayout;
-    }
-
-    private NumberField createNumberField(String label, String suffixText) {
-        NumberField field = new NumberField();
-        field.setLabel(label);
-        Div suffix = new Div();
-        suffix.setText(suffixText);
-        field.setSuffixComponent(suffix);
-        field.setValue(0.0);
-        return field;
-    }
-
-    private TextArea createNoteField() {
-        TextArea noteField = new TextArea();
-        noteField.setLabel("Notes");
-        noteField.setMaxLength(100);
-        noteField.setRequired(true);
-        noteField.setValueChangeMode(ValueChangeMode.EAGER);
-        noteField.setPlaceholder("Easy Zone 2 ride");
-        noteField.addValueChangeListener(e -> e.getSource()
-                .setHelperText(e.getValue().length() + "/100"));
-        return noteField;
     }
 }

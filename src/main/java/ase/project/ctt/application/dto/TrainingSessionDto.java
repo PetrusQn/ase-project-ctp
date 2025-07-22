@@ -1,5 +1,6 @@
 package ase.project.ctt.application.dto;
 
+
 import java.time.LocalDate;
 
 public record TrainingSessionDto (
@@ -11,5 +12,6 @@ public record TrainingSessionDto (
         int avgPower,
         int avgHeartRate,
         int avgCadence,
-        String notes
+        String notes,
+        String name
 ) { }
