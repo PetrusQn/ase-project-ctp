@@ -1,6 +1,6 @@
 package ase.project.ctt.web.view.components;
 
-import ase.project.ctt.application.NewTrainingSessionObserver;
+import ase.project.ctt.application.TrainingSessionObserver;
 import ase.project.ctt.application.dto.TrainingSessionDto;
 import ase.project.ctt.infrastructure.service.TrainingSessionService;
 import ase.project.ctt.web.view.components.dialog.EditTrainingSessionDialog;
@@ -10,7 +10,7 @@ import com.vaadin.flow.component.grid.GridVariant;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-public class TrainingSessionGrid extends Grid<TrainingSessionDto> implements NewTrainingSessionObserver {
+public class TrainingSessionGrid extends Grid<TrainingSessionDto> implements TrainingSessionObserver {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
     private final TrainingSessionService client;

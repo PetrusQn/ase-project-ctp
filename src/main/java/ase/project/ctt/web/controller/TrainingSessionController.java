@@ -31,14 +31,6 @@ public class TrainingSessionController {
         return ResponseEntity.ok(trainingSessionRepository.findAll().stream().map(TrainingSessionMapper::toDto).toList());
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<TrainingSessionDto> getTrainingSessionById(@PathVariable UUID id) {
-//        return trainingSessionRepository.findById(id)
-//                .map(TrainingSessionMapper::toDto)
-//                .map(ResponseEntity::ok)
-//                .orElse(ResponseEntity.notFound().build());
-//    }
-
     @PostMapping
     public ResponseEntity<TrainingSessionDto> createTrainingSession(@RequestBody TrainingSessionDto requestDto) {
         TrainingSession newSession = TrainingSessionMapper.toTrainingSession(requestDto);
@@ -64,6 +56,12 @@ public class TrainingSessionController {
         if (session == null) {
             return ResponseEntity.notFound().build();
         }
+        updateExistingSession(requestDto, session);
+        trainingSessionRepository.save(session);
+        return ResponseEntity.noContent().build();
+    }
+
+    private void updateExistingSession(TrainingSessionDto requestDto, TrainingSession session) {
         session.updateDate(requestDto.date());
         session.updateDuration(new Duration(requestDto.durationInMinutes()));
         session.updateDistance(new Distance(requestDto.distanceInKm()));
@@ -74,9 +72,6 @@ public class TrainingSessionController {
         session.updateAvgCadence(new AvgCadence(requestDto.avgCadence()));
         session.updateNotes(requestDto.notes());
         session.updateName(requestDto.name());
-
-        trainingSessionRepository.save(session);
-        return ResponseEntity.noContent().build();
     }
 
     private TrainingSession findSessionById(String id) {

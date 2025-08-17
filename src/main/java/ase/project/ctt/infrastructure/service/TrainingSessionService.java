@@ -6,7 +6,6 @@ import ase.project.ctt.application.exception.CreateTrainingSessionException;
 import ase.project.ctt.application.exception.DeleteTrainingSessionException;
 import ase.project.ctt.application.exception.NoTrainingSessionsFoundException;
 import ase.project.ctt.application.exception.UpdateTrainingSessionFailedException;
-import ase.project.ctt.application.mapper.TrainingSessionMapper;
 import ase.project.ctt.common.Constants;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
@@ -36,10 +35,11 @@ public class TrainingSessionService implements TrainingSessionClient {
     }
 
     @Override
-    public TrainingSessionDto createSession(TrainingSessionDto newSessionDto) {
+    public boolean createSession(TrainingSessionDto newSessionDto) {
         try {
             HttpEntity<TrainingSessionDto> request = new HttpEntity<>(newSessionDto);
-            return restTemplate.postForObject(BASE_URL, request, TrainingSessionDto.class);
+            restTemplate.postForObject(BASE_URL, request, TrainingSessionDto.class);
+            return true;
         } catch (Exception e) {
             throw new CreateTrainingSessionException("Session could not be created.");
         }

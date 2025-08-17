@@ -1,12 +1,9 @@
 package ase.project.ctt.web.view.components.dialog;
 
-import ase.project.ctt.application.NewTrainingSessionObserver;
+import ase.project.ctt.application.TrainingSessionObserver;
 import ase.project.ctt.application.dto.TrainingSessionDto;
-import ase.project.ctt.application.mapper.TrainingSessionMapper;
-import ase.project.ctt.domain.model.TrainingSession;
 import ase.project.ctt.domain.model.enums.TrainingStatus;
 import ase.project.ctt.domain.model.enums.TrainingType;
-import ase.project.ctt.domain.model.valueobjects.*;
 import ase.project.ctt.infrastructure.service.TrainingSessionService;
 import ase.project.ctt.web.view.components.input.*;
 import com.vaadin.flow.component.button.Button;
@@ -20,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EditTrainingSessionDialog extends Dialog {
-    private final List<NewTrainingSessionObserver> observers;
+    private final List<TrainingSessionObserver> observers;
     private final TrainingSessionDto clickedSession;
     private final TrainingSessionService client;
 
@@ -171,12 +168,12 @@ public class EditTrainingSessionDialog extends Dialog {
         };
     }
 
-    public void addObserver(NewTrainingSessionObserver observer) {
+    public void addObserver(TrainingSessionObserver observer) {
         this.observers.add(observer);
     }
 
     public void updateGridView() {
-        for (NewTrainingSessionObserver observer : this.observers) {
+        for (TrainingSessionObserver observer : this.observers) {
             observer.update();
         }
     }

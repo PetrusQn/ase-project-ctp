@@ -1,6 +1,6 @@
 package ase.project.ctt.web.view;
 
-import ase.project.ctt.application.NewTrainingSessionObserver;
+import ase.project.ctt.application.TrainingSessionObserver;
 import ase.project.ctt.infrastructure.service.TrainingSessionService;
 import ase.project.ctt.web.view.components.input.AddTrainingSessionButton;
 import ase.project.ctt.web.view.components.dialog.CreateTrainingSessionDialog;
@@ -10,7 +10,7 @@ import com.vaadin.flow.router.Route;
 
 
 @Route("")
-public class HomeView extends VerticalLayout implements NewTrainingSessionObserver {
+public class HomeView extends VerticalLayout implements TrainingSessionObserver {
 
     private final TrainingSessionService client;
     private final TrainingSessionGrid trainingSessionGrid;

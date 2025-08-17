@@ -1,6 +1,6 @@
 package ase.project.ctt.web.view.components.dialog;
 
-import ase.project.ctt.application.NewTrainingSessionObserver;
+import ase.project.ctt.application.TrainingSessionObserver;
 import ase.project.ctt.application.dto.TrainingSessionDto;
 import ase.project.ctt.application.mapper.TrainingSessionMapper;
 import ase.project.ctt.domain.model.TrainingSession;
@@ -23,7 +23,7 @@ import java.util.List;
 public class CreateTrainingSessionDialog extends Dialog {
 
     private final TrainingSessionService client;
-    private final List<NewTrainingSessionObserver> observers;
+    private final List<TrainingSessionObserver> observers;
 
     private DatePicker datePicker;
     private NumberField durationField;
@@ -59,12 +59,12 @@ public class CreateTrainingSessionDialog extends Dialog {
         this.nameField = new NameField();
     }
 
-    public void addObserver(NewTrainingSessionObserver observer) {
+    public void addObserver(TrainingSessionObserver observer) {
         this.observers.add(observer);
     }
 
     public void updateGridView() {
-        for (NewTrainingSessionObserver observer : this.observers) {
+        for (TrainingSessionObserver observer : this.observers) {
             observer.update();
         }
     }
@@ -84,8 +84,7 @@ public class CreateTrainingSessionDialog extends Dialog {
 
     private boolean onFormSubmit() {
         if (areRequiredFieldsSet()) {
-            client.createSession(createSessionDtoFromUserInput());
-            return true;
+            return client.createSession(createSessionDtoFromUserInput());
         } else {
             Notification.show("Name is required. Please enter any");
             return false;
