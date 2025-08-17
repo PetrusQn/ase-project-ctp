@@ -8,6 +8,6 @@ import java.util.List;
 public interface TrainingSessionClient {
     List<TrainingSessionDto> getAllSessions();
     TrainingSessionDto createSession(TrainingSessionDto sessionToCreate);
-    void deleteSession(TrainingSessionDto sessionToDelete);
+    boolean deleteSession(TrainingSessionDto sessionToDelete);
     boolean updateSession(TrainingSessionDto sessionToUpdate);
 }

@@ -2,10 +2,12 @@ package ase.project.ctt.infrastructure.service;
 
 import ase.project.ctt.application.client.TrainingSessionClient;
 import ase.project.ctt.application.dto.TrainingSessionDto;
+import ase.project.ctt.application.exception.CreateTrainingSessionException;
+import ase.project.ctt.application.exception.DeleteTrainingSessionException;
 import ase.project.ctt.application.exception.NoTrainingSessionsFoundException;
+import ase.project.ctt.application.exception.UpdateTrainingSessionFailedException;
 import ase.project.ctt.application.mapper.TrainingSessionMapper;
 import ase.project.ctt.common.Constants;
-import ase.project.ctt.domain.model.valueobjects.SessionId;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -35,14 +37,22 @@ public class TrainingSessionService implements TrainingSessionClient {
 
     @Override
     public TrainingSessionDto createSession(TrainingSessionDto newSessionDto) {
-        HttpEntity<TrainingSessionDto> request = new HttpEntity<>(newSessionDto);
-        return restTemplate.postForObject(BASE_URL, request, TrainingSessionDto.class);
+        try {
+            HttpEntity<TrainingSessionDto> request = new HttpEntity<>(newSessionDto);
+            return restTemplate.postForObject(BASE_URL, request, TrainingSessionDto.class);
+        } catch (Exception e) {
+            throw new CreateTrainingSessionException("Session could not be created.");
+        }
     }
 
     @Override
-    public void deleteSession(TrainingSessionDto sessionDtoToDelete) {
-        HttpEntity<TrainingSessionDto> request = new HttpEntity<>(sessionDtoToDelete);
-        restTemplate.delete(BASE_URL + "/" + TrainingSessionMapper.toTrainingSession(sessionDtoToDelete).getId());
+    public boolean deleteSession(TrainingSessionDto sessionDtoToDelete) {
+        try {
+            restTemplate.delete(BASE_URL + "/" + sessionDtoToDelete.id());
+            return true;
+        } catch (Exception e) {
+            throw new DeleteTrainingSessionException("Session could not be deleted.");
+        }
     }
 
     @Override
@@ -51,8 +61,7 @@ public class TrainingSessionService implements TrainingSessionClient {
             restTemplate.put(BASE_URL + "/" + sessionToUpdate.id(), sessionToUpdate);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new UpdateTrainingSessionFailedException("Session could not be edited.");
         }
     }
 }

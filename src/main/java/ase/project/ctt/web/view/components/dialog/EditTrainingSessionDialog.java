@@ -43,8 +43,25 @@ public class EditTrainingSessionDialog extends Dialog {
         VerticalLayout dialogLayout = new VerticalLayout();
         dialogLayout.add(createForm());
         this.add(dialogLayout);
-        this.getFooter().add(createSaveButton());
         this.getFooter().add(createCancelButton());
+        this.getFooter().add(createSaveButton());
+        this.getFooter().add(createDeleteButton());
+    }
+
+    private Button createDeleteButton() {
+        Button deleteButton = new Button("Delete");
+        deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        deleteButton.addClickListener(event -> {
+            if(this.deleteSession()) {
+                this.updateGridView();
+                this.close();
+            }
+        });
+        return deleteButton;
+    }
+
+    private boolean deleteSession() {
+        return this.client.deleteSession(clickedSession);
     }
 
     private Button createSaveButton() {
@@ -60,7 +77,6 @@ public class EditTrainingSessionDialog extends Dialog {
     }
 
     private boolean onFormSubmit() {
-        System.out.println("Please help!");
         return this.client.updateSession(createDtoFromInput());
     }
 
@@ -70,7 +86,7 @@ public class EditTrainingSessionDialog extends Dialog {
                 datePicker.getValue(),
                 durationField.getValue(),
                 distanceField.getValue(),
-                typeSelector.getValue(),
+                getTrainingType().toString(),
                 calcTrainingStatus().toString(),
                 avgPowerField.getValue().intValue(),
                 avgHrField.getValue().intValue(),
@@ -131,6 +147,8 @@ public class EditTrainingSessionDialog extends Dialog {
 
     private Button createCancelButton() {
         Button cancelButton = new Button("Cancel");
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        cancelButton.getStyle().set("margin-right", "auto");
         cancelButton.addClickListener(event -> {
             this.close();
         });

@@ -46,15 +46,24 @@ public class TrainingSessionController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Void> updateTrainingSession(@PathVariable String id, @RequestBody TrainingSessionDto requestDto) {
-        Optional<TrainingSession> possibleSession = trainingSessionRepository.findById(SessionId.of(UUID.fromString(id)));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTrainingSession(@PathVariable String id) {
+        TrainingSession session = findSessionById(id);
 
-        if (possibleSession.isEmpty()) {
+        if (session == null) {
             return ResponseEntity.notFound().build();
         }
-        TrainingSession session = possibleSession.get();
+        trainingSessionRepository.delete(session);
+        return ResponseEntity.noContent().build();
+    }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateTrainingSession(@PathVariable String id, @RequestBody TrainingSessionDto requestDto) {
+        TrainingSession session = findSessionById(id);
+
+        if (session == null) {
+            return ResponseEntity.notFound().build();
+        }
         session.updateDate(requestDto.date());
         session.updateDuration(new Duration(requestDto.durationInMinutes()));
         session.updateDistance(new Distance(requestDto.distanceInKm()));
@@ -66,8 +75,12 @@ public class TrainingSessionController {
         session.updateNotes(requestDto.notes());
         session.updateName(requestDto.name());
 
-        // session.updateAllAttributesBy(TrainingSessionMapper.toTrainingSession(requestDto));
         trainingSessionRepository.save(session);
         return ResponseEntity.noContent().build();
+    }
+
+    private TrainingSession findSessionById(String id) {
+        Optional<TrainingSession> possibleSession = trainingSessionRepository.findById(SessionId.of(UUID.fromString(id)));
+        return possibleSession.orElse(null);
     }
 }
