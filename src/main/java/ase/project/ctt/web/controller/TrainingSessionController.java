@@ -4,16 +4,16 @@ import ase.project.ctt.application.dto.TrainingSessionDto;
 import ase.project.ctt.application.mapper.TrainingSessionMapper;
 import ase.project.ctt.common.Constants;
 import ase.project.ctt.domain.model.TrainingSession;
+import ase.project.ctt.domain.model.enums.TrainingStatus;
 import ase.project.ctt.domain.model.enums.TrainingType;
-import ase.project.ctt.domain.model.valueobjects.SessionId;
+import ase.project.ctt.domain.model.valueobjects.*;
 import ase.project.ctt.infrastructure.repository.TrainingSessionRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -31,29 +31,43 @@ public class TrainingSessionController {
         return ResponseEntity.ok(trainingSessionRepository.findAll().stream().map(TrainingSessionMapper::toDto).toList());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<TrainingSessionDto> getTrainingSessionById(@PathVariable UUID id) {
-        return trainingSessionRepository.findById(SessionId.of(id))
-                .map(TrainingSessionMapper::toDto)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
+//    @GetMapping("/{id}")
+//    public ResponseEntity<TrainingSessionDto> getTrainingSessionById(@PathVariable UUID id) {
+//        return trainingSessionRepository.findById(id)
+//                .map(TrainingSessionMapper::toDto)
+//                .map(ResponseEntity::ok)
+//                .orElse(ResponseEntity.notFound().build());
+//    }
 
     @PostMapping
     public ResponseEntity<TrainingSessionDto> createTrainingSession(@RequestBody TrainingSessionDto requestDto) {
-        TrainingSession newSession = TrainingSessionMapper.fromDto(requestDto);
+        TrainingSession newSession = TrainingSessionMapper.toTrainingSession(requestDto);
         trainingSessionRepository.save(newSession);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-//    @GetMapping("/type/{type}")
-//    public List<TrainingSession> getTrainingSessionsByType(@PathVariable String type) {
-//        return trainingSessionRepository.findByTrainingType(TrainingType.valueOf(type.toUpperCase()));
-//    }
-//
-//    @GetMapping("/range")
-//    public List<TrainingSession> getByDateRange(@RequestParam String start, @RequestParam String end) {
-//        return trainingSessionRepository.findByDateBetween(
-//                LocalDate.parse(start), LocalDate.parse(end));
-//    }
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateTrainingSession(@PathVariable String id, @RequestBody TrainingSessionDto requestDto) {
+        Optional<TrainingSession> possibleSession = trainingSessionRepository.findById(SessionId.of(UUID.fromString(id)));
+
+        if (possibleSession.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        TrainingSession session = possibleSession.get();
+
+        session.updateDate(requestDto.date());
+        session.updateDuration(new Duration(requestDto.durationInMinutes()));
+        session.updateDistance(new Distance(requestDto.distanceInKm()));
+        session.updateTrainingType(TrainingType.valueOf(requestDto.trainingType().toUpperCase()));
+        session.updateTrainingStatus(TrainingStatus.valueOf(requestDto.trainingStatus().toUpperCase()));
+        session.updateAvgPower(new AvgPower(requestDto.avgPower()));
+        session.updateAvgHr(new AvgHeartRate(requestDto.avgHeartRate()));
+        session.updateAvgCadence(new AvgCadence(requestDto.avgCadence()));
+        session.updateNotes(requestDto.notes());
+        session.updateName(requestDto.name());
+
+        // session.updateAllAttributesBy(TrainingSessionMapper.toTrainingSession(requestDto));
+        trainingSessionRepository.save(session);
+        return ResponseEntity.noContent().build();
+    }
 }

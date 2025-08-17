@@ -2,8 +2,11 @@ package ase.project.ctt.web.view.components.dialog;
 
 import ase.project.ctt.application.NewTrainingSessionObserver;
 import ase.project.ctt.application.dto.TrainingSessionDto;
+import ase.project.ctt.application.mapper.TrainingSessionMapper;
+import ase.project.ctt.domain.model.TrainingSession;
 import ase.project.ctt.domain.model.enums.TrainingStatus;
 import ase.project.ctt.domain.model.enums.TrainingType;
+import ase.project.ctt.domain.model.valueobjects.*;
 import ase.project.ctt.infrastructure.service.TrainingSessionService;
 import ase.project.ctt.web.view.components.input.*;
 import com.vaadin.flow.component.button.Button;
@@ -19,6 +22,7 @@ import java.util.List;
 public class EditTrainingSessionDialog extends Dialog {
     private final List<NewTrainingSessionObserver> observers;
     private final TrainingSessionDto clickedSession;
+    private final TrainingSessionService client;
 
     private DatePicker datePicker;
     private NumberField durationField;
@@ -30,13 +34,15 @@ public class EditTrainingSessionDialog extends Dialog {
     private NoteField noteField;
     private NameField nameField;
 
-    public EditTrainingSessionDialog(TrainingSessionDto clickedSession) {
+    public EditTrainingSessionDialog(TrainingSessionService client, TrainingSessionDto clickedSession) {
         this.observers = new ArrayList<>();
+        this.client = client;
         this.clickedSession = clickedSession;
         this.setHeaderTitle("Edit: " + clickedSession.name());
         this.initInputFields();
         VerticalLayout dialogLayout = new VerticalLayout();
         dialogLayout.add(createForm());
+        this.add(dialogLayout);
         this.getFooter().add(createSaveButton());
         this.getFooter().add(createCancelButton());
     }
@@ -54,19 +60,45 @@ public class EditTrainingSessionDialog extends Dialog {
     }
 
     private boolean onFormSubmit() {
-        return false;
+        System.out.println("Please help!");
+        return this.client.updateSession(createDtoFromInput());
+    }
+
+    private TrainingSessionDto createDtoFromInput() {
+        return new TrainingSessionDto(
+                clickedSession.id(),
+                datePicker.getValue(),
+                durationField.getValue(),
+                distanceField.getValue(),
+                typeSelector.getValue(),
+                calcTrainingStatus().toString(),
+                avgPowerField.getValue().intValue(),
+                avgHrField.getValue().intValue(),
+                avgCadenceField.getValue().intValue(),
+                noteField.getValue(),
+                nameField.getValue()
+        );
     }
 
     private void initInputFields() {
         this.datePicker = new DatePicker();
+        datePicker.setValue(clickedSession.date());
         this.durationField = new NumberField("Duration", "min");
+        durationField.setValue(clickedSession.durationInMinutes());
         this.distanceField = new NumberField("Distance", "km");
+        distanceField.setValue(clickedSession.distanceInKm());
         this.avgPowerField = new NumberField("Average power", "w");
+        avgPowerField.setValue((double)clickedSession.avgPower());
         this.avgHrField = new NumberField("Average heart rate", "bpm");
+        avgHrField.setValue((double)clickedSession.avgHeartRate());
         this.avgCadenceField = new NumberField("Average cadence", "rpm");
+        avgCadenceField.setValue((double)clickedSession.avgCadence());
         this.typeSelector = new TypeSelector();
+        typeSelector.setValue(clickedSession.trainingType());
         this.noteField = new NoteField();
+        noteField.setValue(clickedSession.notes());
         this.nameField = new NameField();
+        nameField.setValue(clickedSession.name());
     }
 
     private FormLayout createForm() {
@@ -78,18 +110,21 @@ public class EditTrainingSessionDialog extends Dialog {
         firstRow.add(nameField, datePicker);
 
         FormLayout.FormRow secondRow = new FormLayout.FormRow();
-        secondRow.add(durationField, distanceField);
+        secondRow.add(datePicker);
 
         FormLayout.FormRow thirdRow = new FormLayout.FormRow();
-        thirdRow.add(typeSelector);
+        thirdRow.add(durationField, distanceField);
 
         FormLayout.FormRow fourthRow = new FormLayout.FormRow();
-        fourthRow.add(avgPowerField, avgHrField, avgCadenceField);
+        fourthRow.add(typeSelector);
 
         FormLayout.FormRow fifthRow = new FormLayout.FormRow();
-        fifthRow.add(noteField, 3);
+        fifthRow.add(avgPowerField, avgHrField, avgCadenceField);
 
-        formLayout.add(firstRow, secondRow, thirdRow, fourthRow, fifthRow);
+        FormLayout.FormRow sixthRow = new FormLayout.FormRow();
+        sixthRow.add(noteField, 3);
+
+        formLayout.add(firstRow, secondRow, thirdRow, fourthRow, fifthRow, sixthRow);
 
         return formLayout;
     }

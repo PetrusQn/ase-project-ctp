@@ -6,6 +6,7 @@ public class DatePicker extends com.vaadin.flow.component.datepicker.DatePicker 
     public DatePicker() {
         this.setRequired(true);
         this.setValue(LocalDate.now());
+        this.setLabel("Date");
     }
 
     public void resetValue() {

@@ -20,7 +20,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrainingSessionDialog extends Dialog {
+public class CreateTrainingSessionDialog extends Dialog {
 
     private final TrainingSessionService client;
     private final List<NewTrainingSessionObserver> observers;
@@ -35,7 +35,7 @@ public class TrainingSessionDialog extends Dialog {
     private NoteField noteField;
     private NameField nameField;
 
-    public TrainingSessionDialog(TrainingSessionService client) {
+    public CreateTrainingSessionDialog(TrainingSessionService client) {
         this.client = client;
         this.observers = new ArrayList<>();
         this.setHeaderTitle("New training session");
@@ -156,18 +156,21 @@ public class TrainingSessionDialog extends Dialog {
         firstRow.add(nameField, datePicker);
 
         FormLayout.FormRow secondRow = new FormLayout.FormRow();
-        secondRow.add(durationField, distanceField);
+        secondRow.add(datePicker);
 
         FormLayout.FormRow thirdRow = new FormLayout.FormRow();
-        thirdRow.add(typeSelector);
+        thirdRow.add(durationField, distanceField);
 
         FormLayout.FormRow fourthRow = new FormLayout.FormRow();
-        fourthRow.add(avgPowerField, avgHrField, avgCadenceField);
+        fourthRow.add(typeSelector);
 
         FormLayout.FormRow fifthRow = new FormLayout.FormRow();
-        fifthRow.add(noteField, 3);
+        fifthRow.add(avgPowerField, avgHrField, avgCadenceField);
 
-        formLayout.add(firstRow, secondRow, thirdRow, fourthRow, fifthRow);
+        FormLayout.FormRow sixthRow = new FormLayout.FormRow();
+        sixthRow.add(noteField, 3);
+
+        formLayout.add(firstRow, secondRow, thirdRow, fourthRow, fifthRow, sixthRow);
 
         return formLayout;
     }

@@ -1,19 +1,23 @@
 package ase.project.ctt.web.view.components;
 
+import ase.project.ctt.application.NewTrainingSessionObserver;
 import ase.project.ctt.application.dto.TrainingSessionDto;
+import ase.project.ctt.infrastructure.service.TrainingSessionService;
 import ase.project.ctt.web.view.components.dialog.EditTrainingSessionDialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.data.renderer.LocalDateRenderer;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-public class TrainingSessionGrid extends Grid<TrainingSessionDto> {
+public class TrainingSessionGrid extends Grid<TrainingSessionDto> implements NewTrainingSessionObserver {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+    private final TrainingSessionService client;
 
-    public TrainingSessionGrid(List<TrainingSessionDto> trainingSessions) {
+    public TrainingSessionGrid(TrainingSessionService client) {
+        this.client = client;
+        List<TrainingSessionDto> trainingSessions = this.client.getAllSessions();
         if(trainingSessions != null) {
             this.addColumns();
             this.setItems(trainingSessions);
@@ -43,7 +47,13 @@ public class TrainingSessionGrid extends Grid<TrainingSessionDto> {
     }
 
     private void onDoubleClick(TrainingSessionDto clickedSessionDto) {
-        EditTrainingSessionDialog editTrainingSessionDialog = new EditTrainingSessionDialog(clickedSessionDto);
+        EditTrainingSessionDialog editTrainingSessionDialog = new EditTrainingSessionDialog(client, clickedSessionDto);
         editTrainingSessionDialog.open();
+        editTrainingSessionDialog.addObserver(this);
+    }
+
+    @Override
+    public void update() {
+        this.updateContent(client.getAllSessions());
     }
 }

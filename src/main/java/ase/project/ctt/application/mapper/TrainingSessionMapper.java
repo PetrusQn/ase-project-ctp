@@ -8,7 +8,7 @@ import ase.project.ctt.domain.model.valueobjects.*;
 
 public class TrainingSessionMapper {
 
-    public static TrainingSession fromDto(TrainingSessionDto dto) {
+    public static TrainingSession toTrainingSession(TrainingSessionDto dto) {
         return TrainingSession.create(
                 dto.date(),
                 new Duration(dto.durationInMinutes()),
@@ -25,6 +25,7 @@ public class TrainingSessionMapper {
 
     public static TrainingSessionDto toDto(TrainingSession trainingSession) {
         return new TrainingSessionDto(
+                trainingSession.getId(),
                 trainingSession.getDate(),
                 trainingSession.getDuration().getDuration(),
                 trainingSession.getDistance().getKilometers(),

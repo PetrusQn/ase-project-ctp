@@ -6,14 +6,12 @@ import ase.project.ctt.domain.model.valueobjects.*;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
 
 @Entity
 @Table(name = "training_sessions")
 public class TrainingSession {
 
-     @EmbeddedId
+    @EmbeddedId
     private SessionId id;
 
     private LocalDate date;
@@ -140,6 +138,10 @@ public class TrainingSession {
         return this.name;
     }
 
+    public void updateDate(LocalDate newDate) {
+        this.date = newDate;
+    }
+
     public void updateDuration(Duration newDuration) {
         this.duration = newDuration;
     }
@@ -174,5 +176,18 @@ public class TrainingSession {
 
     public void updateName(String newName) {
         this.name = newName;
+    }
+
+    public void updateAllAttributesBy(TrainingSession newSession) {
+        this.date = newSession.getDate();
+        this.duration = newSession.getDuration();
+        this.distance = newSession.getDistance();
+        this.trainingType = newSession.getTrainingType();
+        this.trainingStatus = newSession.getTrainingStatus();
+        this.avgPower = newSession.getAvgPower();
+        this.avgHr = newSession.getAvgHr();
+        this.avgCadence = newSession.getAvgCadence();
+        this.notes = newSession.getNotes();
+        this.name = newSession.getName();
     }
 }

@@ -33,8 +33,19 @@ public class SessionId {
         return value;
     }
 
+    public void setValueFromString(String uuidAsString) {
+        this.value = UUID.fromString(uuidAsString);
+    }
+
     @Override
     public String toString() {
         return value.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SessionId sessionId)) return false;
+        return Objects.equals(value, sessionId.value);
     }
 }
