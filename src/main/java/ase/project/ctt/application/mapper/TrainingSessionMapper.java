@@ -27,7 +27,7 @@ public class TrainingSessionMapper {
         return new TrainingSessionDto(
                 trainingSession.getId(),
                 trainingSession.getDate(),
-                trainingSession.getDuration().getDuration(),
+                trainingSession.getDuration().get(),
                 trainingSession.getDistance().getKilometers(),
                 trainingSession.getTrainingType().name(),
                 trainingSession.getTrainingStatus().name(),

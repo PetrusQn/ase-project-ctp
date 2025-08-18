@@ -3,8 +3,6 @@ package ase.project.ctt.domain.model.valueobjects;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
-import java.util.Objects;
-
 @Embeddable
 public class Duration {
 
@@ -22,7 +20,7 @@ public class Duration {
         this.minutes = minutes;
     }
 
-    public double getDuration() {
+    public double get() {
         return this.minutes;
     }
 

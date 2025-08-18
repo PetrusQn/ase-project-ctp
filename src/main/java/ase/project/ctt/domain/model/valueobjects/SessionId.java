@@ -33,10 +33,6 @@ public class SessionId {
         return value;
     }
 
-    public void setValueFromString(String uuidAsString) {
-        this.value = UUID.fromString(uuidAsString);
-    }
-
     @Override
     public String toString() {
         return value.toString();
